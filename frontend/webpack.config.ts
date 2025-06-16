@@ -90,7 +90,7 @@ const webpackConfig = (env): Configuration => ({
     proxy: {
       '/api': {
         target: {
-          host: 'backend',
+          host: 'localhost',
           protocol: 'http:',
           port: 3000
         },
