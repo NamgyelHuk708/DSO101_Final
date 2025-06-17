@@ -1,8 +1,5 @@
 # Development environment
-
-FROM node:12-alpine
-
-# Do not use 'COPY . .' to copy all files. Copying all files will force a build even if no client files have been modified
+FROM node:18-alpine
 
 # Set app directory
 WORKDIR /app
@@ -13,22 +10,20 @@ ENV NODE_OPTIONS=--max_old_space_size=4096
 # Install
 COPY package.json ./
 COPY sync-package-lock ./
-# If package-lock.json is not found in previous step, it will be created in the following npm install
-RUN npm install
+RUN npm install --legacy-peer-deps && npm install -g knex
 
 # Build
 COPY nodemon.json ./
 COPY tsconfig.json ./
 COPY src ./src
-# RUN npm run build
+COPY database ./database
+COPY database/migrations ./database/migrations 
+ # <-- Added this line
+COPY __tests__ ./__tests__
 
-# Migrations
-COPY database ./
-# Run migrations. This is also responsible of copying node_modules and package-lock.json to host machine.
+# Entrypoint
 COPY docker-entrypoint.sh /docker-entrypoint.sh
 RUN chmod +x /docker-entrypoint.sh
 
 ENTRYPOINT [ "/docker-entrypoint.sh" ]
-
-# CMD is not executed when command is defined in docker compose
 CMD [ "npm", "run", "serve" ]

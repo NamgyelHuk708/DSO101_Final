@@ -1,8 +1,5 @@
-# Production environment
-
-FROM node:12-alpine
-
-# Do not use 'COPY . .' to copy all files. Copying all files will force a build even if no client files have been modified
+# Development environment
+FROM node:18-alpine
 
 # Set app directory
 WORKDIR /app
@@ -10,26 +7,22 @@ WORKDIR /app
 # Environment variables
 ENV NODE_OPTIONS=--max_old_space_size=4096
 
-# Install
+# Install dependencies
 COPY package.json ./
 COPY sync-package-lock ./
-# In production, we will use the package lock generated in the development process. No versions surprises.
-RUN npm clean-install
+RUN npm install
 
-# Build
+# Copy application files
 COPY nodemon.json ./
 COPY tsconfig.json ./
 COPY src ./src
+COPY database ./database
+COPY __tests__ ./__tests__ 
+ # Explicitly copy tests
 
-RUN npm run build
-
-# Migrations
-COPY database ./
-# Run migrations. This is also responsible of copying node_modules and package-lock.json to host machine.
+# Entrypoint setup
 COPY docker-entrypoint.sh /docker-entrypoint.sh
 RUN chmod +x /docker-entrypoint.sh
 
 ENTRYPOINT [ "/docker-entrypoint.sh" ]
-
-# CMD is not executed when command is defined in docker compose
 CMD [ "npm", "run", "serve" ]
