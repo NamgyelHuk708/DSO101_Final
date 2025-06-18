@@ -28,5 +28,3 @@ jobs:
         run: |
           docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/bmi-frontend-dev:latest -f frontend/Dockerfile.dev frontend
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/bmi-frontend-dev:latest
-
-#g
