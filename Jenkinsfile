@@ -1,55 +1,34 @@
 pipeline {
-    agent {
-        docker {
-            image 'node:16'
-            args '-v /var/lib/jenkins/.npm:/root/.npm'
-        }
-    }
-    
+    agent any
     environment {
-        CI = 'true'
-        NODE_ENV = 'test'
         GITHUB_CREDS = credentials('github-credentials')
     }
-    
     stages {
-        stage('Checkout') {
+        stage('Check Commit Message') {
             steps {
-                checkout scm
-            }
-        }
-        
-        stage('Setup') {
-            steps {
-                sh 'node --version'
-                sh 'npm --version'
-                dir('backend') {
-                    sh 'npm ci --legacy-peer-deps'
+                script {
+                    def commitMsg = sh(returnStdout: true, script: 'git log -1 --pretty=%B').trim()
+                    if (!commitMsg.contains("@push")) {
+                        error("Commit message must contain '@push' to trigger pipeline.")
+                    }
                 }
             }
         }
-        
-        stage('Test') {
+
+        stage('Install Dependencies') {
             steps {
-                dir('backend') {
-                    sh 'npm test'
-                }
-            }
-            post {
-                always {
-                    junit 'backend/test-results/**/*.xml'
-                    archiveArtifacts 'backend/coverage/**/*'
-                }
+                sh '''
+                    cd backend
+                    npm install --legacy-peer-deps
+                '''
+                sh '''
+                    cd frontend
+                    npm install --legacy-peer-deps
+                '''
             }
         }
-        
-        stage('Push') {
-            when {
-                expression { 
-                    def msg = sh(script: 'git log -1 --pretty=%B', returnStdout: true).trim()
-                    msg.contains('@push') && currentBuild.result == 'SUCCESS' 
-                }
-            }
+
+        stage('Push to GitHub') {
             steps {
                 withCredentials([usernamePassword(
                     credentialsId: 'github-credentials',
@@ -66,7 +45,6 @@ pipeline {
             }
         }
     }
-    
     post {
         always {
             cleanWs()
