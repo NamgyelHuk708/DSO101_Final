@@ -12,14 +12,18 @@ COPY package.json ./
 COPY sync-package-lock ./
 RUN npm install --legacy-peer-deps && npm install -g knex
 
+# Create required directories
+RUN mkdir -p /app/database/migrations
+
 # Build
 COPY nodemon.json ./
 COPY tsconfig.json ./
 COPY src ./src
-COPY database ./database
-COPY database/migrations ./database/migrations 
- # <-- Added this line
+COPY database ./database  
+# Includes knexfile.js
 COPY __tests__ ./__tests__
+COPY knexfile.js ./      
+ # Explicitly copy knexfile to root
 
 # Entrypoint
 COPY docker-entrypoint.sh /docker-entrypoint.sh

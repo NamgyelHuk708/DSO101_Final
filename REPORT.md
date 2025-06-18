@@ -432,3 +432,113 @@ docker-compose run test ping -c 4 db
 
 ```
 ![alt text](image/11.png)
+
+# Stage 2: Jenkins Local Setup for GitHub Push Automation
+
+## Objective
+Configure Jenkins to automatically trigger a pipeline when a commit message contains `@push`, then push the code back to GitHub after running basic build and test stages.
+
+## What We Did
+
+1. **Set Up Jenkins Locally**
+   - Installed required plugins (Git, Pipeline, GitHub Integration)
+
+2. **Stored GitHub Credentials in Jenkins**
+   - Added a **Personal Access Token (PAT)** with `repo` permissions in GitHub
+   - Saved it in Jenkins under **Credentials → Global Credentials** with ID `github-credentials`
+
+![alt text](image/13.png)
+![alt text](image/12.png)
+
+3. **Created a Jenkins Pipeline Job**
+   - Named the job `Studentnumber_app_pipeline` (e.g., `12345_app_pipeline`)
+   - Configured the pipeline to fetch the `Jenkinsfile` directly from the GitHub repository (**SCM integration**)
+
+![alt text](image/14.png)
+
+4. **Wrote the `Jenkinsfile`**
+   - Defined stages to:
+     1. **Check commit messages** for `@push`
+     2. **Build** the application (placeholder for future steps)
+     3. **Run tests** (placeholder for Jest tests)
+     4. **Push changes back to GitHub** using stored credentials
+
+5. **Tested the Pipeline**
+   - Made a commit with `@push` in the message:
+   ```bash
+   git commit -m "Test Jenkins pipeline @push"
+   git push origin main
+   ```
+   - Verified that Jenkins:
+     - Detected the `@push` keyword
+     - Executed all stages
+     - Pushed the code back to GitHub
+
+## Explanation of the `Jenkinsfile`
+
+The `Jenkinsfile` defines the pipeline stages using **Declarative Pipeline Syntax**:
+
+```groovy
+pipeline {
+  agent any  // Runs on any available Jenkins agent
+  environment {
+    // Loads GitHub credentials stored in Jenkins
+    GITHUB_CREDS = credentials('github-credentials')
+  }
+  stages {
+    stage('Check Commit Message') {
+      steps {
+        script {
+          // Fetches the last commit message
+          def commitMsg = sh(returnStdout: true, script: 'git log -1 --pretty=%B').trim()
+          // Fails the pipeline if "@push" is missing
+          if (!commitMsg.contains("@push")) {
+            error("Commit message does not contain '@push'. Aborting.")
+          }
+        }
+      }
+    }
+    stage('Build') {
+      steps { echo "Building..." }  // Placeholder for build steps (e.g., npm install)
+    }
+    stage('Test') {
+      steps { echo "Running tests..." }  // Placeholder for test commands (e.g., npm test)
+    }
+    stage('Push to GitHub') {
+      steps {
+        // Authenticates with GitHub using credentials
+        withCredentials([usernamePassword(
+          credentialsId: 'github-credentials',
+          usernameVariable: 'GITHUB_USER',
+          passwordVariable: 'GITHUB_TOKEN'
+        )]) {
+          sh '''
+            git config --global user.email "jenkins@example.com"
+            git config --global user.name "Jenkins"
+            // Updates the remote URL with credentials and pushes
+            git remote set-url origin https://${GITHUB_USER}:${GITHUB_TOKEN}@github.com/NamgyelHuk708/DSO101_Final.git
+            git push origin HEAD:main
+          '''
+        }
+      }
+    }
+  }
+}
+```
+
+## Challenges & Solutions
+
+### Challenge 1: Jenkins couldn't fetch the `Jenkinsfile`
+**Solution:** Verified the **repository URL** and **Script Path** in job configuration.
+
+### Challenge 2: Pipeline failed on `@push` check
+**Solution:** Ensured the commit message **exactly** contained `@push`.
+
+### Challenge 3: Permission denied during GitHub push
+**Solution:** Regenerated the GitHub PAT with `repo` scope and re-added credentials to Jenkins.
+
+## Screenshots
+
+1. **Successful Pipeline Run**  
+![alt text](image/16.png)
+
