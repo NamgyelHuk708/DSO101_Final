@@ -31,5 +31,5 @@ RUN chmod +x /docker-entrypoint.sh
 
 ENTRYPOINT [ "/docker-entrypoint.sh" ]
 
-# CMD is not executed when command is defined in docker compose
+# CMD is not executed when command is defined in docker composedasdada
 CMD [ "npm", "run", "serve" ]
