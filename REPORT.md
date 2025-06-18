@@ -604,19 +604,31 @@ RUN npm install --legacy-peer-deps
 ## Screenshots
 
 1. **Successful Pipeline Run**
+
  ![alt text](image/17.png)
 
+
 2. **Docker Hub Images Published**
+
 ![alt text](image/18.png)
 
 ## Stage 3: Deploy to Render 
 1. **Create the DB in the render**
+
 ![alt text](image/21.png)
 
 2. **Deploy the backend and update the environment**
+
 ![alt text](image/22.png)
+
 ![alt text](image/23.png)
 
 3. **Update the environment variable and update the frontend to make ready fo deployment**
+
 ![alt text](image/25.png)
 
+4. **Frontend Deployment**
+
+![alt text](image/26.png)
+
+## Remder Url: https://bmi-frontend-dev-8.onrender.com/
