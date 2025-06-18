@@ -21,16 +21,20 @@ jobs:
 
       - name: Build and Push Frontend
         run: |
+          cd frontend
           docker buildx build \
-            --file frontend/Dockerfile.prod \
-            --tag ${{ secrets.DOCKERHUB_USERNAME }}/dso101-frontend:latest \
+            -f Dockerfile.prod \
+            -t ${{ secrets.DOCKERHUB_USERNAME }}/dso101-frontend:latest \
+            --platform linux/amd64 \
             --push \
-            frontend/
+            .
 
       - name: Build and Push Backend
         run: |
+          cd backend
           docker buildx build \
-            --file backend/Dockerfile.prod \
-            --tag ${{ secrets.DOCKERHUB_USERNAME }}/dso101-backend:latest \
+            -f Dockerfile.prod \
+            -t ${{ secrets.DOCKERHUB_USERNAME }}/dso101-backend:latest \
+            --platform linux/amd64 \
             --push \
-            backend/
+            .
