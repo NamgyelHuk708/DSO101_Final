@@ -17,7 +17,7 @@ COPY sync-package-lock ./
 # If package-lock.json is not found in previous step, it will be created in the following npm install
 RUN npm install
 
-# Development server
+# Development serverss
 COPY src ./src
 COPY public ./public
 COPY .eslintrc.js ./
