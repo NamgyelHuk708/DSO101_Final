@@ -1,34 +1,45 @@
 pipeline {
-    agent any
+    agent {
+        docker {
+            image 'node:16-bullseye'
+            args '-v /home/jenkins/.npm:/root/.npm --privileged'
+        }
+    }
     environment {
-        GITHUB_CREDS = credentials('github-credentials')
+        NPM_CONFIG_LEGACY_PEER_DEPS = 'true'
     }
     stages {
-        stage('Check Commit Message') {
+        stage('Setup Environment') {
             steps {
-                script {
-                    def commitMsg = sh(returnStdout: true, script: 'git log -1 --pretty=%B').trim()
-                    if (!commitMsg.contains("@push")) {
-                        error("Commit message must contain '@push' to trigger pipeline.")
-                    }
-                }
+                sh '''
+                    node --version
+                    npm --version
+                '''
             }
         }
-
+        
         stage('Install Dependencies') {
             steps {
                 sh '''
                     cd backend
-                    npm install --legacy-peer-deps
-                '''
-                sh '''
-                    cd frontend
-                    npm install --legacy-peer-deps
+                    rm -rf node_modules package-lock.json
+                    npm cache clean --force
+                    npm install --legacy-peer-deps --no-optional --verbose 2>&1 | tee npm-install.log
                 '''
             }
+            post {
+                always {
+                    archiveArtifacts artifacts: 'backend/npm-install.log'
+                }
+            }
         }
-
+        
         stage('Push to GitHub') {
+            when {
+                expression {
+                    sh(script: 'git log -1 --pretty=%B | grep -q "@push"', returnStatus: true) == 0
+                }
+            }
             steps {
                 withCredentials([usernamePassword(
                     credentialsId: 'github-credentials',
