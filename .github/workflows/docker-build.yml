@@ -18,8 +18,7 @@ jobs:
 
       - name: Build and Push Frontend
         run: |
-          cd frontend
-          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/dso101-frontend:latest -f Dockerfile.prod .
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/dso101-frontend:latest -f frontend/Dockerfile.prod frontend/
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/dso101-frontend:latest
 
       - name: Build and Push Backend
