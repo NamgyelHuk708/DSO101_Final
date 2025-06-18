@@ -33,3 +33,29 @@ ENTRYPOINT [ "/docker-entrypoint.sh" ]
 
 # CMD is not executed when command is defined in docker composedasdada
 CMD [ "npm", "run", "serve" ]
+
+# FROM node:18-alpine
+# WORKDIR /app
+
+# # Set production environment
+# ENV NODE_ENV=production
+# ENV NODE_OPTIONS=--max_old_space_size=4096
+
+# # Install production dependencies only
+# COPY package.json sync-package-lock ./
+# RUN npm install --production && \
+#     npm cache clean --force
+
+# # Copy only necessary files
+# COPY tsconfig.json ./
+# COPY src ./src
+# COPY database ./database
+# COPY docker-entrypoint.sh /docker-entrypoint.sh
+# RUN chmod +x /docker-entrypoint.sh
+
+# # Build TypeScript (if needed)
+# RUN if [ -f tsconfig.json ]; then npm run build; fi
+
+# ENTRYPOINT ["/docker-entrypoint.sh"]
+# CMD ["node", "dist/main.js"] 
+#  # Adjust based on your entry file

@@ -1,8 +1,5 @@
 # Final Project Report - Continuous Integration and Continuous Deployment
 
-**Course:** DSO101  
-**Student:** [Your Name]
-
 ## 1. Introduction
 
 The project involved enhancing a **PERN stack (PostgreSQL, Express, React, Node.js)** application by implementing a **BMI Calculator** feature. The goal was to add input fields for height, weight, and age, calculate BMI, store the data in a database, and ensure proper testing using **Jest**.
@@ -27,26 +24,6 @@ CREATE TABLE bmi_records (
 CREATE INDEX idx_bmi_records_created_at ON bmi_records(created_at);
 ```
 
-#### Database Configuration (`knexfile.js`)
-
-```javascript
-module.exports = {
-  client: 'pg',
-  version: '12',
-  connection: {
-    host: process.env.DATABASE_HOST,
-    port: Number(process.env.DATABASE_PORT),
-    user: process.env.DATABASE_USER,
-    password: process.env.DATABASE_PASSWORD,
-    database: process.env.DATABASE_NAME,
-    ssl: { rejectUnauthorized: false }
-  },
-  pool: { min: 1, max: 2 },
-  migrations: { tableName: 'knex_migrations' },
-  debug: true
-};
-```
-
 **Key Features:**
 - **Structured storage** for BMI data (height in meters, weight in kg, age, calculated BMI)
 - **Timestamps** to track record creation
@@ -65,7 +42,7 @@ module.exports = {
      - Input validation (rejects missing/negative values)
      - Correctly stores data in PostgreSQL
    - `GET /api/user/bmi`
-     - Returns all records in descending chronological order
+     - Returns all records in descending  order
    - `DELETE /api/user/bmi/:id`
      - Validates ID format
      - Handles non-existent records gracefully
@@ -138,11 +115,6 @@ The project has successfully implemented:
 - Implemented **RESTful APIs** for CRUD operations
 - Ensured **data validity** through backend checks
 - Included **automated tests** for critical functionality
-
-# Final Project Report - Continuous Integration and Continuous Deployment
-
-**Course:** DSO101  
-**Student:** [Your Name]
 
 ## 1. Introduction
 
@@ -636,4 +608,15 @@ RUN npm install --legacy-peer-deps
 
 2. **Docker Hub Images Published**
 ![alt text](image/18.png)
+
+## Stage 3: Deploy to Render 
+1. **Create the DB in the render**
+![alt text](image/21.png)
+
+2. **Deploy the backend and update the environment**
+![alt text](image/22.png)
+![alt text](image/23.png)
+
+3. **Update the environment variable and update the frontend to make ready fo deployment**
+![alt text](image/25.png)
 
