@@ -18,19 +18,21 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Build and Push Frontend
-        run: |
-          cd frontend
-          docker buildx build \
-            --platform linux/amd64 \
-            -t ${{ secrets.DOCKERHUB_USERNAME }}/dso101-frontend:latest \
-            -f Dockerfile.prod \
-            --push .
+        uses: docker/build-push-action@v5
+        with:
+          context: ./frontend
+          file: ./frontend/Dockerfile.prod
+          push: true
+          tags: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/pern-frontend:latest
+            ${{ secrets.DOCKERHUB_USERNAME }}/pern-frontend:${{ github.sha }}
 
       - name: Build and Push Backend
-        run: |
-          cd backend
-          docker buildx build \
-            --platform linux/amd64 \
-            -t ${{ secrets.DOCKERHUB_USERNAME }}/dso101-backend:latest \
-            -f Dockerfile.prod \
-            --push .
+        uses: docker/build-push-action@v5
+        with:
+          context: ./backend
+          file: ./backend/Dockerfile.prod
+          push: true
+          tags: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/pern-backend:latest
+            ${{ secrets.DOCKERHUB_USERNAME }}/pern-backend:${{ github.sha }}
