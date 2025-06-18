@@ -542,3 +542,98 @@ pipeline {
 1. **Successful Pipeline Run**  
 ![alt text](image/16.png)
 
+# Stage 3: GitHub Actions Pipeline for Docker Builds
+
+The goal of Stage 3 was to automate the building and pushing of Docker images for both the **frontend** and **backend** services to **Docker Hub** whenever changes are pushed to the `main` branch of the GitHub repository.
+
+## Implementation Details
+
+1. Docker Hub Integration
+- Stored credentials securely using GitHub Secrets (DOCKERHUB_USERNAME, DOCKERHUB_TOKEN).
+
+![alt text](image/20.png)
+![alt text](image/19.png)
+
+### Workflow Configuration
+Created `.github/workflows/docker-build.yml` with:
+
+```yaml
+name: Docker Build and Push
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Debug Docker Hub Username
+        run: echo "Docker Hub Username length:" $(echo "${{ secrets.DOCKERHUB_USERNAME }}" | wc -c)
+        
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+        
+      - name: Build and Push Backend (Dev)
+        uses: docker/build-push-action@v5
+        with:
+          context: backend
+          file: backend/Dockerfile.dev
+          push: true
+          tags: namgyelhuk708/bmi-backend-dev:latest
+          
+      - name: Build and Push Frontend (Dev)
+        uses: docker/build-push-action@v5
+        with:
+          context: frontend
+          file: frontend/Dockerfile.dev
+          push: true
+          tags: namgyelhuk708/bmi-frontend-dev:latest
+```
+
+## Challenges & Solutions
+
+### Challenge 1: Docker Build Context Missing
+**Error:** `docker: 'docker buildx build' requires 1 argument`
+
+**Solution:** Used explicit `context` parameter in build-push-action and verified directory structure matches workflow expectations.
+
+### Challenge 2: Invalid Docker Tag Format
+**Error:** `invalid tag "/bmi-backend-dev:latest"`
+
+**Solution:** Added debug step to verify secret length and hardcoded username temporarily for testing.
+
+
+### Challenge 3: NPM Dependency Conflicts
+**Error:** `npm ERR! Fix the upstream dependency conflict`
+
+**Solution:** Modified Dockerfiles to use `--legacy-peer-deps` flag and updated both frontend and backend Dockerfiles.
+
+```dockerfile
+# Updated install command in Dockerfile.dev
+RUN npm install --legacy-peer-deps
+```
+## Verification & Testing
+
+### Successful Execution
+1. **Workflow Run:** Successfully completed all build and push operations
+2. **Docker Hub Results:**
+   - Backend image: `namgyelhuk708/bmi-backend-dev:latest`
+   - Frontend image: `namgyelhuk708/bmi-frontend-dev:latest`
+
+## Screenshots
+
+1. **Successful Pipeline Run**
+ ![alt text](image/17.png)
+
+2. **Docker Hub Images Published**
+![alt text](image/18.png)
+
