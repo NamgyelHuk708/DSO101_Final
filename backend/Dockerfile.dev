@@ -1,33 +1,29 @@
 # Development environment
-FROM node:18-alpine
+FROM node:16
 
-# Set app directory
 WORKDIR /app
 
-# Environment variables
 ENV NODE_OPTIONS=--max_old_space_size=4096
 
-# Install
+# Install dependencies
 COPY package.json ./
 COPY sync-package-lock ./
-RUN npm install --legacy-peer-deps && npm install -g knex
+RUN npm install
+RUN npm install dotenv
 
-# Create required directories
-RUN mkdir -p /app/database/migrations
-
-# Build
-COPY nodemon.json ./
+# Add source files
 COPY tsconfig.json ./
+COPY nodemon.json ./
 COPY src ./src
-COPY database ./database  
-# Includes knexfile.js
-COPY __tests__ ./__tests__
-COPY knexfile.js ./      
- # Explicitly copy knexfile to root
+COPY database ./
 
-# Entrypoint
+# Compile TypeScript
+RUN npm run build
+
+# Setup migrations
 COPY docker-entrypoint.sh /docker-entrypoint.sh
 RUN chmod +x /docker-entrypoint.sh
 
 ENTRYPOINT [ "/docker-entrypoint.sh" ]
+
 CMD [ "npm", "run", "serve" ]
