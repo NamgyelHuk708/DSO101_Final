@@ -425,7 +425,7 @@ docker exec -it postgres_db psql -U postgres -d BMI -c "INSERT INTO bmi_records 
 
 docker-compose restart
 
-docker exec -it postgres_db psql -U postgres -d BMI -c "SELECT * FROM bmi_records;"
+docker exec -it postgres_db psql -U postgres -d BMI -c "SELECT * FROM bmi_records;"l
 
 # Verify network
 docker-compose run test ping -c 4 db
