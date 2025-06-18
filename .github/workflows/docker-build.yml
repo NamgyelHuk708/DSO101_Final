@@ -18,17 +18,17 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Build and Push Frontend
-        working-directory: frontend
         run: |
           docker buildx build \
             -t ${{ secrets.DOCKERHUB_USERNAME }}/dso101-frontend:latest \
-            -f Dockerfile.prod \
-            --push .
+            -f frontend/Dockerfile.prod \
+            --push \
+            frontend/
 
       - name: Build and Push Backend
-        working-directory: backend
         run: |
           docker buildx build \
             -t ${{ secrets.DOCKERHUB_USERNAME }}/dso101-backend:latest \
-            -f Dockerfile.prod \
-            --push .
+            -f backend/Dockerfile.prod \
+            --push \
+            backend/
