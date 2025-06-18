@@ -20,7 +20,7 @@ const BMICalculator = () => {
     setLoading(true);
     setMessage('');
     try {
-      const res = await fetch('/api/user/bmi', {
+      const res = await fetch('https://bmi-backend-dev-au6q.onrender.com/api/user/bmi', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -101,7 +101,7 @@ const BMICalculator = () => {
     setBmi(bmiVal);
 
     try {
-      const res = await fetch('/api/create/bmi', {
+      const res = await fetch('https://bmi-backend-dev-au6q.onrender.com/api/create/bmi', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
